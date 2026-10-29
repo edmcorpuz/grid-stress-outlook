@@ -2,51 +2,55 @@
 
 Your segment of the 20-minute defense. Full running order: [PRESENTATION-SCRIPT.md](../PRESENTATION-SCRIPT.md).
 
-## 7. Small intervals. A growing workload.
+## 9. Keep the original. Build trust in layers.
 
-**Barsomo** · 08:00–09:10 (01:10)
+*Part 5 of 9 · Data ingestion and storage*
 
-Thank you, Corpuz. The enhanced WESM uses five-minute dispatch and settlement intervals. At that resolution, one non-leap year contains 105,120 intervals per series.
+**Barsomo** · 08:00–09:25 (01:25)
 
-For an illustrative case with 300 units and 12 measures, that gives about 378 million scalar values per year. These are values, not necessarily rows. In a wide table with 12 measure columns, the same example is about 31.5 million unit-interval rows.
+Thank you, Corpuz. For ingestion, we start batch-first: Airflow collects files on a schedule and checks them on arrival. Kafka streaming is optional later, only if an authorized real-time feed exists.
 
-The workload also includes parsing reports, joining sources, and recomputing rolling features. This motivates testing scalable tools, but it does not prove that a single machine cannot handle the data. We would benchmark the actual dataset and use distributed processing only when the measured workload justifies it.
+For storage, think of a lakehouse as three shelves. Raw keeps exactly what we received. Clean holds standardized, checked records. Curated holds analysis-ready tables. We propose object storage such as S3, Parquet files and Delta tables, with Spark as a candidate for large transformations.
 
-**Stage cue:** Say “values, not rows.” Do not compare the scalar count with an Excel row limit.
+Every record keeps its source, load time and processing version, so any result can be traced back to the original file and reproduced.
 
-**Transition / handoff:** Our design separates original records from cleaned and analysis-ready data.
+**Stage cue:** Explain Raw → Clean → Curated. Avoid a tool-by-tool lecture.
 
-**References:** [3]
-
----
-
-## 8. Keep the original. Build trust in layers.
-
-**Barsomo** · 09:10–10:40 (01:30)
-
-Think of the lakehouse as three shelves. Raw holds what we actually received. Clean holds standardized and checked records. Curated holds the tables and features used for analysis.
-
-We propose object storage such as S3, Parquet files, and Delta tables where transactional versioning is needed. Airflow schedules batch collection and validation. Spark is a candidate for larger transformations. Kafka and streaming processing are optional later, only if an authorized timely feed exists.
-
-Every derived record should preserve a source reference, ingestion time, and transformation version. This lets us answer where a result came from and reproduce it. Retrying a job is not enough to guarantee no data loss: retention, checkpoints, idempotent writes, and reconciliation all matter. Starting batch-first makes the pilot more realistic and easier to audit.
-
-**Stage cue:** Use Raw → Clean → Curated as the explanation. Avoid a tool-by-tool lecture.
-
-**Transition / handoff:** On top of those layers, the warehouse needs a very clear grain.
+**Transition / handoff:** On top of the curated layer sits the warehouse.
 
 ---
 
-## 9. One row. One grid. One interval.
+## 10. One row. One grid. Five minutes.
 
-**Barsomo** · 10:40–12:00 (01:20)
+*Part 5 of 9 · Data ingestion and storage*
 
-The grain of fact_grid_interval is one grid at one five-minute interval, when we have valid observations at that resolution. It contains measures such as demand, available capacity, imports, and price, with reserve margin derived where appropriate.
+**Barsomo** · 09:25–10:50 (01:25)
 
-Grid and time dimensions support filtering and aggregation. Alerts and plant outages are separate fact tables because an event window or a plant outage is not the same thing as a grid interval. Shared dimensions let us analyze them together without multiplying rows accidentally.
+The warehouse uses a star schema. The main fact table, fact_grid_interval, has one row per grid per five-minute interval, where real observations support that level. It holds demand, available capacity, imports, price and the derived margin.
 
-A daily advisory cannot simply be copied across the day and treated as measured five-minute telemetry. We retain source resolution, valid time, and missingness. For analysis, we aggregate available observations into grid-day features. The appendix explains the table grain and example OLAP operations if you would like more detail.
+Grid and time dimensions let us filter and summarize. Alerts and plant outages are separate fact tables, because an alert window or an outage is not the same thing as a five-minute interval.
 
-**Stage cue:** Memorize the grain. This is the most important warehouse answer.
+This supports OLAP: roll up from intervals to days or months, drill down to an alert window, slice to Visayas, or dice by grid and season. A daily advisory is never copied across a day and treated as five-minute data.
 
-**Transition / handoff:** Nuril will explain how we prepare the data and discover stress patterns.
+**Stage cue:** Memorize the grain. It is the most important warehouse answer.
+
+**Transition / handoff:** Before analysis, the data has to be prepared.
+
+---
+
+## 11. No peeking at tomorrow.
+
+*Part 6 of 9 · Data preprocessing*
+
+**Barsomo** · 10:50–12:00 (01:10)
+
+Preprocessing has three steps. First, standardize plant names, units and time stamps, remove duplicates, and flag missing intervals instead of hiding them.
+
+Second, build features such as supply margin, unavailable capacity, demand changes and weather summaries, usually per grid per day.
+
+Third, respect time. We split the history in order: earlier data for training, later data for testing. Scaling, gap filling, PCA and clustering are fitted on the training period only. A value recorded yesterday but published tomorrow cannot be used for a warning today.
+
+**Stage cue:** Emphasize the difference between when data is observed and when it is published.
+
+**Transition / handoff:** Nuril will explain how we look for patterns.
 

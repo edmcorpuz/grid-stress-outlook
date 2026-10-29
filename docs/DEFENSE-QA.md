@@ -14,7 +14,7 @@ Soriano coordinates. Let one presenter finish before another adds detail. Do not
 | Why use a data lake and warehouse? | The lake preserves heterogeneous source evidence; dimensional tables serve consistent SQL and OLAP. A lakehouse can support both. | Barsomo |
 | What is your main fact grain? | One grid at one five-minute interval, only where valid observations support that resolution. Alerts and plant outages have separate event grains. | Barsomo |
 | Can daily advisories become five-minute observations? | Not by copying them. Preserve their source resolution and validity, and flag missing measurements. | Barsomo |
-| Is 378 million the number of rows? | No. It is scalar values in an illustrative sizing case. With 12 measures per row, it is about 31.5 million unit-interval rows. | Barsomo |
+| Is 378 million the number of rows? | No. It is scalar values in an illustrative sizing case. With 12 measures per row, it is about 31.5 million unit-interval rows. | Soriano |
 | Why Spark instead of one computer? | It is a candidate for larger joins and rolling features. We would benchmark actual data; distributed processing is not automatically necessary. | Barsomo |
 | ETL or ELT? | Raw data lands first, then transformations produce clean and curated tables: primarily ELT, with intake validation. | Barsomo |
 | Does Kafka guarantee zero loss? | Not by itself. Retention, durability, offsets, checkpoints, idempotent writes, and recovery testing matter. | Barsomo |
@@ -26,12 +26,14 @@ Soriano coordinates. Let one presenter finish before another adds detail. Do not
 | Why not deep learning? | Start with transparent baselines and limited rare-event data. More complex models can be compared later if data and evaluation justify them. | Nuril |
 | Does clustering predict tomorrow? | No. A separate time-aware mapping or warning rule must connect available features to later outcomes and be validated. | Mariano |
 | Where do future inputs come from? | Lagged observations and forecasts available at issue time, where authorized access exists. Archived as-issued forecasts are needed for honest backtesting. | Mariano |
-| How do you prevent leakage? | Chronological splits, issue/publication-time checks, and fitting all preprocessing only on training data. | Nuril |
+| How do you prevent leakage? | Chronological splits, issue/publication-time checks, and fitting all preprocessing only on training data. | Barsomo |
 | How will you validate? | Rolling chronological backtests with thresholds set on validation data, then untouched later test periods and horizon-matched baselines. | Mariano |
 | What does “false alarms under 20%” mean? | Unmatched warning episodes divided by all warning episodes: false-warning share, not the classical false-positive rate. | Mariano |
 | Did you already reach 80% recall or three-day lead time? | No. Those are proposed targets to discuss and evaluate during a pilot. | Mariano |
 | Could warnings cause market or public harm? | Yes. Start with authorized human review, appropriate access controls, clear uncertainty, and coordinated communication. | Mariano |
 | Are the 3D data real? | The scenes are synthetic explanatory illustrations. Specific historical figures are labeled and cited separately. | Soriano |
+| Where are your limitations, ethics and privacy? | Slide 16, in the main talk: data access and quality, rare events and drift, and privacy, security and human review. | Mariano |
+| Does the talk follow the required format? | Yes. All nine parts, in order, with nothing added; each slide shows its part number. Press O for the part-by-part overview. | Soriano |
 
 ## When you do not yet know
 
@@ -39,11 +41,11 @@ Say: “That has not been established in this proposal. We would test it by ___.
 
 ## Rehearsal handoffs
 
-- **Soriano → Corpuz:** “Corpuz will explain the information gap and the data we propose to combine.”
-- **Corpuz → Barsomo:** “Barsomo will now show how we would store and organize those sources.”
-- **Barsomo → Nuril:** “Nuril will explain how we prepare the data and discover stress patterns.”
-- **Nuril → Mariano:** “Mariano will connect these patterns to a testable warning proposal.”
+- **Soriano → Corpuz (after slide 5):** “Corpuz will explain why warnings like this are hard to see early.”
+- **Corpuz → Barsomo (after slide 8):** “Barsomo will show how we would store these sources.”
+- **Barsomo → Nuril (after slide 11):** “Nuril will explain how we look for patterns.”
+- **Nuril → Mariano (after slide 14):** “Mariano will connect these patterns to a warning we can test.”
 
 ## If you are running late
 
-Skip the optional simulator, shorten source examples, and keep one sentence per method. Do **not** omit that results are unvalidated or that clustering alone is not forecasting. Leave the appendix for questions.
+Skip the optional what-if slider, shorten source examples, and keep one sentence per method. Do **not** omit that results are unvalidated or that clustering alone is not forecasting. Leave the appendix for questions.

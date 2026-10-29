@@ -51,6 +51,6 @@ No custom GitHub Actions workflow is required. Optional CI/deploy workflow examp
 - If the PC is slow, append `?static=1` or pause motion with **M**.
 - Use extended displays for private notes. Never mirror the notes window to the projector.
 - Download/print the combined script. Initial site loading requires internet; offline refresh is not guaranteed.
-- Leave the main deck on slide 16 for Q&A. Use **O** for the appendix.
+- Leave the main deck on slide 17 for Q&A. Use **O** for the appendix.
 
 The repository is intentionally public, including the original files and the five presenter names. No API credentials, personal customer records, or application backend are included.

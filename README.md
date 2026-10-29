@@ -1,6 +1,6 @@
 # Grid Stress Outlook
 
-**A 20-minute research defense for five presenters.** A focused 16-slide story, five optional appendix slides, dimensional Three.js visuals, plain-language scripts, and a private presenter window.
+**A 20-minute research defense for five presenters.** 17 short slides that follow the required nine-part format in order, four optional appendix slides, one continuous Three.js world the camera flies through, plain-language scripts, and a private presenter window.
 
 > Proposal, not a live warning service. Historical figures are cited; 3D scenes are illustrative; targets are not measured performance.
 
@@ -16,18 +16,20 @@ The public presentation is designed for **GitHub Pages**, using GitHub alone—n
 
 See [PUBLISHING.md](docs/PUBLISHING.md) for GitHub-only hosting and updates.
 
-After publishing, open the Pages URL in Chrome or Edge, use fullscreen, and press **T** when Soriano begins. Open the page and check its 3D view before the defense. A first load needs internet. Once assets are loaded, navigation and the optional teaching demo do not call external services. For a no-network fallback, bring the printable script/PDF. `?static=1` skips WebGL on older classroom hardware.
+After publishing, open the Pages URL in Chrome or Edge, use fullscreen, and press **T** when Soriano begins. Open the page and check its 3D view before the defense. A first load needs internet. Once assets are loaded, navigation and the optional teaching demo do not call external services. For a no-network fallback, bring the printable script/PDF. The 3D lowers its own quality on slow PCs; `?quality=low` forces the lighter mode and `?static=1` skips WebGL entirely.
 
 ## The team and timing
 
-| Presenter | Slides | Time window | Topic |
+| Presenter | Slides | Time window | Parts of the format |
 |---|---|---|---|
-| **Soriano — leader** | 1–3 | 00:00–04:00 | Problem and evidence |
-| **Corpuz** | 4–6 | 04:00–08:00 | Objectives and sources |
-| **Barsomo** | 7–9 | 08:00–12:00 | Architecture and warehouse |
-| **Nuril** | 10–13 | 12:00–16:00 | Preparation and methods |
-| **Mariano** | 14–16 | 16:00–19:30 | Warning design and validation |
+| **Soriano — leader** | 1–5 | 00:00–04:00 | 1 Introduction · 2 Problem (alerts, −77 MW) |
+| **Corpuz** | 6–8 | 04:00–08:00 | 2 Problem statement · 3 Objectives · 4 Data sources |
+| **Barsomo** | 9–11 | 08:00–12:00 | 5 Ingestion and storage · 6 Preprocessing |
+| **Nuril** | 12–14 | 12:00–16:00 | 7 Exploration and analysis |
+| **Mariano** | 15–17 | 16:00–19:30 | 8 Expected outcome and implementation · 9 Conclusion |
 | Shared buffer | — | 19:30–20:00 | Transitions / recovery |
+
+Every main slide shows its part ("Part 4 of 9 · Data source and characteristics"), and **O** opens an overview grouped by part.
 
 Q&A is separate. If your 20 minutes must also include Q&A, rehearse a shorter talk.
 
@@ -50,10 +52,10 @@ Q&A is separate. If your 20 minutes must also include Q&A, rehearse a shorter ta
 | N | Rehearsal notes **visible on the current screen** |
 | T | Start / pause the shared 20-minute timer |
 | F | Fullscreen |
-| M | Pause / resume decorative motion |
+| M | Pause / resume motion (camera flights snap instead) |
 | Esc | Close a dialog |
 
-The main talk stops on slide 16; it does not accidentally advance into the appendix. Open **O** for appendix questions. URLs such as `#slide-9` deep-link to a slide.
+The on-screen controls hide while the mouse is still and come back when it moves, so the projector shows only the slide. The main talk stops on slide 17; it does not accidentally advance into the appendix. Open **O** for appendix questions. URLs such as `#slide-9` deep-link to a slide.
 
 **Private notes:** use extended displays, not mirrored displays. Put the audience deck on the projector and the **P** window on your own display. Both windows must stay on the same origin/browser context; they synchronize through BroadcastChannel. On one shared screen, use printed notes instead. Browser popup blocking may need to be allowed.
 

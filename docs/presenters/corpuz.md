@@ -2,49 +2,55 @@
 
 Your segment of the 20-minute defense. Full running order: [PRESENTATION-SCRIPT.md](../PRESENTATION-SCRIPT.md).
 
-## 4. The signals exist. The view is fragmented.
+## 6. The signals exist. They’re scattered.
+
+*Part 2 of 9 · Statement of the problem*
 
 **Corpuz** · 04:00–05:15 (01:15)
 
-Thank you, Soriano. The challenge we address is bringing different signals together. A grid advisory may be a PDF, market observations may be interval tables, and weather readings may come from separate stations.
+Thank you, Soriano. Our problem statement: the warning signs of a shortfall already exist, but they are spread across separate sources, formats and schedules.
 
-Each source answers part of the question, but their names, timestamps, and formats do not necessarily line up. A number is difficult to interpret if we cannot tell which grid and period it belongs to, or whether it was available at the time a warning would have been issued.
+Grid advisories, market tables and weather records use different names, time stamps and formats. They are mostly read after the fact, and alerts are usually announced on the day itself.
 
-We propose a traceable integration for this study. We are not claiming that NGCP or other organizations have no existing forecasting tools. Establishing that broader research gap would require a separate review of operational systems and literature.
+NGCP and DOE do publish supply outlooks, so we are not claiming nothing exists. What is missing for our study is one traceable, combined view that lets us test whether patterns in this data give useful early warning.
 
-**Stage cue:** Use the three signal groups as your speaking guide. No interaction is needed.
+**Stage cue:** Use the three signal groups as your speaking guide.
 
-**Transition / handoff:** This gives us one main objective and three analytical questions.
-
----
-
-## 5. One objective. An earlier, clearer view.
-
-**Corpuz** · 05:15–06:40 (01:25)
-
-Our general objective is to design and evaluate a framework that integrates grid, market, and weather data to identify stress patterns and investigate early-warning signals.
-
-We ask three analytical questions. First, which variables move with grid stress, and do any of them provide useful earlier information? Second, can we summarize overlapping variables without losing too much information? Third, are there recurring types of stress days, such as high-demand days or supply-loss days?
-
-Correlation, principal component analysis, and clustering address those questions. A fourth engineering objective supports all three: build traceable storage and warehouse tables. The phrase early warning describes the research goal. It is not yet an achieved three-day prediction result.
-
-**Stage cue:** Point to each question once. Avoid introducing all the tool names twice.
-
-**Transition / handoff:** To answer those questions, we need four complementary sources.
+**Transition / handoff:** That gives us one objective and three questions.
 
 ---
 
-## 6. Four sources. One shared clock.
+## 7. One objective. Three questions.
 
-**Corpuz** · 06:40–08:00 (01:20)
+*Part 3 of 9 · Objectives and research questions*
 
-NGCP advisories describe alert periods and reported grid conditions. IEMOP market data provides interval observations such as demand and prices. DOE publications help identify plants and their characteristics. PAGASA contributes weather information.
+**Corpuz** · 05:15–06:35 (01:20)
 
-We would map these sources onto a shared Philippine time convention, while preserving their original timestamps and publication times. A five-minute market interval does not mean that every source publishes fresh data every five minutes.
+Our general objective is to design and evaluate a framework that combines grid, market and weather data to find grid-stress patterns and test possible early-warning signals.
 
-Public reports can support a retrospective pilot, subject to availability and terms of use. More detailed or timely feeds may require agreements. We will not assume there is a public real-time API for every source. The first implementation task is a data inventory: what exists, at what resolution, with what delay and permission?
+Three questions guide the analysis. First, which signals move with stress, and do any move earlier? We answer that with correlation. Second, can a few factors summarize many overlapping signals? That is PCA. Third, which types of stress days repeat? That is clustering.
 
-**Stage cue:** Emphasize “publication time” and “access.” These are likely panel questions.
+A supporting objective is engineering: build traceable storage and warehouse tables so every result can be checked. “Early warning” is our research goal, not a result we have already achieved.
 
-**Transition / handoff:** Barsomo will now show how we would store and organize those sources.
+**Stage cue:** Point to each question once. Name each method only once.
+
+**Transition / handoff:** To answer them, we need four sources.
+
+---
+
+## 8. Four sources. One shared clock.
+
+*Part 4 of 9 · Data source and characteristics*
+
+**Corpuz** · 06:35–08:00 (01:25)
+
+NGCP advisories give alert periods and reported grid conditions. IEMOP market data gives five-minute observations such as demand and prices, plus day-ahead and week-ahead projections. DOE’s list of existing power plants is a PDF updated from time to time. PAGASA weather data is mostly daily and is often provided as Excel files on request.
+
+So the sources differ in format, frequency and access. We would line them up on one Philippine time standard while keeping each source’s original time stamp and publication time. Five-minute market data does not make daily weather five-minute fresh.
+
+Public reports can support a first, retrospective pilot. More detailed or timely feeds would need data agreements. Our first task is an inventory: what exists, how often, how late, and with what permission.
+
+**Stage cue:** Stress “publication time” and “access.” These are likely panel questions.
+
+**Transition / handoff:** Barsomo will show how we would store these sources.
 

@@ -30,15 +30,16 @@ Checked: enhanced WESM transition to five-minute dispatch and settlement. Histor
 
 ## Original material
 
-User-supplied files: [original HTML](../originals/original.html) and [original Markdown](../originals/original.md). These are preserved unchanged. Their external CDN dependencies, claims, simulated demonstrations, and other references are part of the original artifact, not automatically endorsed by the redesigned presentation. No separate full Claude conversation export was found; the rebuild uses the supplied artifact and Markdown.
+User-supplied files: [original HTML](../originals/original.html) and [original Markdown](../originals/original.md). These are preserved unchanged. Their external CDN dependencies, claims, simulated demonstrations, and other references are part of the original artifact, not automatically endorsed by the redesigned presentation. The redesign follows the nine-part presentation format and the data corrections recorded in the original Claude conversation.
 
 ## What is illustrative
 
-- The simplified Philippine outline, luminous beacons, and connections are explanatory. They are not a transmission-network map or live telemetry. Visayas is marked as the proposed pilot, not as a current alert.
-- All floating records, signal points, curves, and clusters are synthetic visual metaphors. They do not run PCA or k-means or encode measured results.
+- The 3D world is explanatory. The simplified Philippine outline, beacons, city lights and connections are not a transmission-network map or live telemetry. Visayas is marked as the proposed pilot, not as a current alert.
+- The 123 alert pillars are arranged decoratively; only their count and color split (93 yellow, 30 red) are reported. The supply and demand columns use the reported 20 October figures plus the illustrative reserve requirements below.
+- The data cubes, signal streams, source pillars, lakehouse records, star schema, time tunnel, waves, point cloud and clusters are synthetic visual metaphors. They do not run PCA or k-means or encode measured results.
 - 300 units × 12 measures × 105,120 intervals = 378,432,000 scalar values, or 31,536,000 unit-interval rows in a 12-measure wide table. This is sizing, not observed data.
-- The optional simulator uses fixed illustrative requirements (4% of demand, 150 MW contingency). Its starting capacity and projected demand are the reported October 20 figures.
-- The outlook card is a concept, not a forecast. No alerts, emails, or SMS messages are sent.
+- The optional what-if slider uses fixed illustrative requirements (4% of demand, 150 MW contingency). Its starting capacity and projected demand are the reported October 20 figures.
+- The outlook heat glow and radar sweep are a concept, not a forecast. No alerts, emails, or SMS messages are sent.
 - Recall, false-warning share, and lead-time targets are provisional, not measured performance.
 
 ## Geographic asset
@@ -47,7 +48,7 @@ Bundled simplified Philippines GeoJSON: https://github.com/johan/world.geo.json/
 
 ## Design inspiration
 
-Reviewed Awwwards' 3D gallery: https://www.awwwards.com/websites/3d/. The design adopts broad techniques—large editorial typography, restrained color, dimensional scenes, subtle light, and minimal navigation—not another site's code, imagery, or identity. All scenes in src/scene.ts are created for this deck.
+Reviewed Awwwards' 3D gallery: https://www.awwwards.com/websites/3d/. The design adopts broad techniques—one continuous 3D world with camera flights between shots, large editorial typography, restrained color, glow, and controls that hide when idle—not another site's code, imagery, or identity. All scenes in src/scene.ts are created for this deck.
 
 ## Software and fonts
 

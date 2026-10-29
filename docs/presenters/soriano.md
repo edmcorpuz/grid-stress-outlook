@@ -4,51 +4,95 @@ Your segment of the 20-minute defense. Full running order: [PRESENTATION-SCRIPT.
 
 ## 1. See the stress. Before the shortfall.
 
-**Soriano · Leader** · 00:00–01:10 (01:10)
+*Part 1 of 9 · Introduction*
 
-Good morning, panel members. We are Soriano, Corpuz, Barsomo, Nuril, and Mariano. Our proposal is Grid Stress Pattern Analysis for Early Warning of Power Supply Shortfalls in the Philippine Power Grids.
+**Soriano · Leader** · 00:00–00:40 (00:40)
 
-The idea is simple: combine information about electricity supply, demand, and weather so we can study the warning signs together, rather than reading separate reports.
+Good morning, panel members. We are Group 3: Soriano, Corpuz, Barsomo, Nuril and Mariano. Our proposal is Grid Stress Pattern Analysis for Early Warning of Power Supply Shortfalls in the Philippine Power Grids.
 
-This is a proposed research framework, not a working forecast service. Today we will explain the problem, the data design, the analysis, and how we would test whether it really provides useful warning. The 3D map is an explanatory visual; it does not show live grid conditions.
+In one sentence: we propose combining grid, market and weather data so the warning signs of a supply shortfall can be studied together, instead of in separate reports.
 
-**Stage cue:** Start the timer when you begin speaking. Introduce the team; do not explain the interface.
+This is a research proposal, not a working forecast service. The 3D scenes are illustrations; they do not show live grid data.
 
-**Transition / handoff:** First, why is this problem worth studying?
+**Stage cue:** Start the timer as you begin. Introduce the team; do not explain the interface.
+
+**Transition / handoff:** First, the field we are working in.
 
 ---
 
-## 2. Not one bad day. A recurring problem.
+## 2. Supply must meet demand. Every second.
 
-**Soriano · Leader** · 01:10–02:30 (01:20)
+*Part 1 of 9 · Introduction*
 
-The Daily Tribune, reporting NGCP figures through the Philippine News Agency, recorded 123 Visayas grid alerts from January to September 3, 2026. That total consists of 93 yellow alerts and 30 red alerts.
+**Soriano · Leader** · 00:40–01:30 (00:50)
 
-These are alert counts. We are not saying that there were 123 unique days of alerts, or that every alert caused a blackout. An alert is a warning about the available supply and required reserves.
+Our field is energy and power systems analytics: studying how electricity is generated, transmitted and used so the grid stays balanced.
 
-The useful message is that this is a recurring planning concern, not an isolated incident. That makes Visayas a reasonable pilot candidate for our study. We would still need a complete and consistently labeled historical dataset before making comparisons across grids.
+Power plants generate electricity. NGCP operates the high-voltage grid across Luzon, Visayas and Mindanao. Distribution utilities and electric cooperatives deliver it to homes and businesses. DOE sets policy, ERC regulates, and IEMOP runs the electricity spot market.
 
-**Stage cue:** Read only the total and the split. Pause; do not read the citation aloud.
+The basic rule is simple: supply must cover demand at every moment, plus a safety reserve. When that reserve gets too thin, NGCP raises a yellow or red alert.
 
-**Transition / handoff:** To understand those alerts, let us look at the supply margin.
+**Stage cue:** Point to the three glowing grids as you name them.
+
+**Transition / handoff:** This field produces a lot of data, very quickly.
+
+---
+
+## 3. A data machine. Every five minutes.
+
+*Part 1 of 9 · Introduction*
+
+**Soriano · Leader** · 01:30–02:20 (00:50)
+
+Why is this a big data problem? Since 2021, the enhanced spot market dispatches and settles every five minutes. That is 288 intervals a day and 105,120 a year for a single data series.
+
+Take an example of 300 generating units with 12 measures each. That is about 378 million values a year. These are values, not rows; in a table with 12 measure columns it is about 31.5 million rows.
+
+Add weather, outage reports and several years of history, and we have volume, speed and variety at the same time. We would still measure the real dataset before deciding how much distributed processing it needs.
+
+**Stage cue:** Say “values, not rows.” Do not compare the number with Excel.
+
+**Transition / handoff:** And this data matters, because the grid is under real stress.
+
+**References:** [3]
+
+---
+
+## 4. Not one bad day. A recurring problem.
+
+*Part 2 of 9 · Statement of the problem*
+
+**Soriano · Leader** · 02:20–03:10 (00:50)
+
+Now the problem. NGCP figures reported by the Daily Tribune show 123 Visayas grid alerts from January to September 3, 2026: 93 yellow and 30 red.
+
+These are alert counts. They are not 123 separate days, and not every alert caused a blackout. An alert warns that available supply cannot cover the required reserves.
+
+The point is that this keeps happening. That makes Visayas a sensible pilot for our study.
+
+**Stage cue:** Read the total and the split, then pause. Do not read the citation aloud.
+
+**Transition / handoff:** Here is what one of those alerts looks like in numbers.
 
 **References:** [1]
 
 ---
 
-## 3. A small gap. A serious warning.
+## 5. A small gap. A serious warning.
 
-**Soriano · Leader** · 02:30–04:00 (01:30)
+*Part 2 of 9 · Statement of the problem*
 
-GMA News reported 2,468 megawatts of available capacity against a projected peak demand of 2,545 megawatts on October 20. Subtracting the two gives a negative 77-megawatt margin. The advisory placed Visayas on red alert for part of that day.
+**Soriano · Leader** · 03:10–04:00 (00:50)
 
-Supply also needs a safety allowance. Yellow means the operating margin cannot cover the contingency requirement. Red means supply cannot cover demand plus the regulating requirement. So red is possible even when supply is slightly above demand. It does not automatically mean that every customer loses power.
+On October 20, GMA News reported 2,468 megawatts available against a projected peak of 2,545 megawatts in the Visayas. That is 77 megawatts short, and the grid went on red alert for part of the day.
 
-Our optional slider is only a simplified teaching model. Its four-percent regulating requirement and 150-megawatt contingency requirement are assumptions, not an NGCP operating calculation. The starting supply and demand figures are reported evidence.
+Yellow means the operating margin cannot cover the contingency requirement. Red means supply cannot cover demand plus the regulating requirement. So red is possible even when supply is slightly above demand, and it does not automatically mean every customer loses power.
 
-**Stage cue:** Point to the −77 MW gap. Optional: move available capacity to 2,700 MW, then reset. Skip the demo if behind time.
+Optional: the what-if slider is a simplified teaching model. Its 4 percent regulating and 150-megawatt contingency requirements are assumptions, not NGCP’s actual calculation.
 
-**Transition / handoff:** Corpuz will explain the information gap and the data we propose to combine.
+**Stage cue:** Point to the gap at the top of the columns. Optional: drag supply to 2,700 MW to show yellow, then reset. Skip it if behind time.
+
+**Transition / handoff:** Corpuz will explain why warnings like this are hard to see early.
 
 **References:** [2]
 

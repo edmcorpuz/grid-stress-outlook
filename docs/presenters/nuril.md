@@ -2,65 +2,55 @@
 
 Your segment of the 20-minute defense. Full running order: [PRESENTATION-SCRIPT.md](../PRESENTATION-SCRIPT.md).
 
-## 10. Good analysis starts before the algorithm.
+## 12. What moves together? And what comes first?
 
-**Nuril** · 12:00–13:00 (01:00)
+*Part 7 of 9 · Exploration and analysis*
 
-Thank you, Barsomo. We first standardize names, units, and timestamps. We remove duplicates and flag missing intervals. Any short-gap filling must be documented, and we should not fill across major outage events without justification.
+**Nuril** · 12:00–13:20 (01:20)
 
-Next, we build features such as supply margin, unavailable capacity, demand changes, and weather summaries. We distinguish observation time from publication time: a value recorded yesterday but published tomorrow is not available for a warning today.
+Thank you, Barsomo. Our first method is correlation. Pearson measures straight-line relationships; Spearman compares rankings and catches relationships that are not straight lines.
 
-Finally, we split the history chronologically. Scaling, imputation, PCA, and clustering are fitted only on the training period. This avoids data leakage and makes the later evaluation closer to a real deployment.
+We also check lags: does something observed earlier move with stress later? We account for seasons and daily cycles, which can create misleading matches.
 
-**Stage cue:** Emphasize the difference between observation time and publication time.
+Why this method: it is a simple, transparent first screen. A strong correlation is a candidate signal, not proof of cause, and we test candidates on later, unseen periods. The waves on screen are synthetic.
 
-**Transition / handoff:** The first analytical step asks which signals move together.
+**Stage cue:** If asked for a correlation value, say it will be estimated from the real data.
 
----
-
-## 11. What moves together? And what comes first?
-
-**Nuril** · 13:00–14:00 (01:00)
-
-Correlation measures how variables move together. Pearson is useful for linear relationships, while Spearman compares ranked values and can capture monotonic relationships.
-
-We also examine lags: for example, whether information available earlier is associated with stress later. We would account for seasonality and autocorrelation, because repeated daily patterns can produce misleading relationships.
-
-A strong correlation does not prove that a factor caused an alert, and searching many lags can overfit. We therefore treat discovered relationships as candidates to test on later, unseen periods. We are not displaying an invented coefficient or claiming that a three-day signal has already been found.
-
-**Stage cue:** If asked for a correlation value, say it will be estimated from the real dataset.
-
-**Transition / handoff:** Several signals may overlap. PCA helps us summarize that overlap.
+**Transition / handoff:** Many of these signals overlap. PCA helps with that.
 
 ---
 
-## 12. Many measurements. Fewer dimensions.
+## 13. Many signals. A few directions.
 
-**Nuril** · 14:00–15:00 (01:00)
+*Part 7 of 9 · Exploration and analysis*
 
-Principal component analysis, or PCA, creates new axes that summarize variation across standardized variables. It is useful when several measurements contain overlapping information.
+**Nuril** · 13:20–14:40 (01:20)
 
-We inspect the component loadings to understand what contributes to each axis. A name such as heat-driven demand would be an interpretation after fitting, not a label we force onto the result.
+Principal component analysis, or PCA, combines overlapping measurements into a few new summary axes, called components.
 
-An 80-to-90-percent explained-variance threshold can be a starting heuristic, but high variance is not the same as predictive value. A low-variance signal could still matter for alerts. The points on screen are synthetic and illustrate dimensional structure; they are not a fitted result from Philippine grid data.
+We read the loadings to see which variables drive each component. A name like “heat-driven demand” is something we would interpret after fitting, not a label we force.
 
-**Stage cue:** Use “summary axes” if the panel wants a simpler explanation.
+Why this method: it reduces redundancy so later steps are clearer. An 80 to 90 percent explained-variance threshold is a starting guide, but we also check that the components keep information that matters for alerts. The points are synthetic.
 
-**Transition / handoff:** We can then explore whether days form recurring groups in that space.
+**Stage cue:** Say “summary axes” if the panel wants a simpler explanation.
+
+**Transition / handoff:** In that summary space, we can look for groups of similar days.
 
 ---
 
-## 13. Find patterns. Not predetermined labels.
+## 14. Stress has types. Let the data name them.
 
-**Nuril** · 15:00–16:00 (01:00)
+*Part 7 of 9 · Exploration and analysis*
 
-K-means groups days that are close in the selected feature or component space. The four groups shown are illustrative. We have not established that the real data contains exactly four clusters.
+**Nuril** · 14:40–16:00 (01:20)
 
-After fitting, we would inspect each cluster’s feature patterns. We might find calm days, high-demand days, supply-loss days, or mixed conditions. We choose the number of clusters using several checks, not only an elbow chart, and test whether the groups remain stable across seasons.
+k-means groups grid-days that look alike. The four groups on screen are an illustration; we have not shown that the real data has exactly four.
 
-Clustering does not predict a future day by itself. We must define how information available today creates a warning and test that rule against future outcomes. Mariano will explain that bridge and how we will judge success.
+After fitting, we would describe each group, for example calm days, high-demand days, supply-loss days or combined stress. We choose the number of groups using several checks, such as the elbow, silhouette scores and stability across seasons.
 
-**Stage cue:** Let the clusters illustrate similarity. Do not describe the animation as a real training run.
+Why this method: it is an interpretable way to find recurring stress profiles, which we can then compare with later alert rates. Clustering on its own does not predict tomorrow. Mariano will explain that next step.
 
-**Transition / handoff:** Mariano will connect these patterns to a testable warning proposal.
+**Stage cue:** Do not describe the animation as a real training run.
+
+**Transition / handoff:** Mariano will connect these patterns to a warning we can test.
 

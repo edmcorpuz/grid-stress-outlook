@@ -1,5 +1,17 @@
 # What changed from the original
 
+## Simplified redesign (29 October 2026)
+
+- Restored strict compliance with the nine-part presentation format: 17 main slides, each labeled with its part, in order, with nothing added. The introduction to the field and "why big data" are back in Part 1, and limitations, ethics and privacy are back in the main talk (slide 16) instead of only the appendix.
+- Cut on-screen text to a headline, an optional big number and up to four short points per slide (a test enforces about 20 words). The full explanation lives in the speaker notes, presenter window and printed script.
+- Replaced long per-slide disclaimers with one small tag: Reported, Illustrative or Proposed.
+- Replaced the four reused 3D modes with one continuous world: the Philippines at the center and seven stations around it (data cubes, signal streams, four source pillars, lakehouse shelves, star schema, time tunnel, analysis cloud). The camera flies to a new shot on every slide; the finale pulls back to show all stations connected.
+- Controls now hide while the mouse is still; only a thin progress line stays visible.
+- Rebalanced speakers to the format: Soriano 1–5, Corpuz 6–8, Barsomo 9–11, Nuril 12–14, Mariano 15–17.
+- Applied the data notes from the original conversation: PAGASA data is mostly daily (often Excel on request), the DOE plant list is a periodic PDF, IEMOP also publishes day-ahead and week-ahead projections, and NGCP/DOE already publish outlooks, so the contribution is framed as integrated pattern analysis.
+
+## Earlier rebuild
+
 - Replaced the 24-slide, game-HUD presentation with 16 core slides and 5 optional technical appendix slides.
 - Created a 19:30 speaking schedule plus 0:30 buffer within the user's 20-minute limit.
 - Assigned Soriano (leader), Corpuz, Barsomo, Nuril, and Mariano in order, with explicit handoffs and individual scripts.
@@ -20,4 +32,4 @@
 - Added same-horizon baselines, event-matching rules, and human review.
 - Rebuilt 3D illustrations with local assets, bounded rendering resolution, reduced-motion support, a motion toggle, and a static fallback.
 
-The original uploaded files remain unchanged in `originals/`. A separate full Claude session export was not present in the supplied folder.
+The original uploaded files remain unchanged in `originals/`.
