@@ -48,7 +48,7 @@ Bundled simplified Philippines GeoJSON: https://github.com/johan/world.geo.json/
 
 ## Design inspiration
 
-Reviewed Awwwards' 3D gallery: https://www.awwwards.com/websites/3d/. The design adopts broad techniques—one continuous 3D world with camera flights between shots, large editorial typography, restrained color, glow, and controls that hide when idle—not another site's code, imagery, or identity. All scenes in src/scene.ts are created for this deck.
+Reviewed Awwwards' 3D gallery: https://www.awwwards.com/websites/3d/. The design adopts broad techniques—one continuous 3D world with camera flights between shots, a blueprint-to-solid reveal, a planet horizon, large editorial typography, restrained color, glow, and controls that hide when idle—not another site's code, imagery, or identity. All scenes in src/scene.ts are created for this deck.
 
 ## Software and fonts
 

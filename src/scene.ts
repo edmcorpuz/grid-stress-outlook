@@ -3,9 +3,13 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { balance, type Shot } from './content';
+import { createSwarm, type Formation } from './swarm';
+import { createBackdrop, createPlanet, createAtmosphere, createFlowMaterial, createHologramMaterial, makeRevealable } from './effects';
 
-const mint = 0xb8f7ce, teal = 0x73c5b9, blue = 0xa0bced, amber = 0xf3be88, red = 0xff7a66, slate = 0x8fa6c8, bg = 0x070b0e;
+const mint = 0xb8f7ce, teal = 0x73c5b9, blue = 0xa0bced, amber = 0xf3be88, red = 0xff7a66, slate = 0x8fa6c8;
 type Station = 'map' | 'blocks' | 'signals' | 'sources' | 'layers' | 'schema' | 'tunnel' | 'analysis';
 type V3 = [number, number, number];
 /** One world, one camera: each slide is a shot of a station. Camera and target are in the station's local space. */
@@ -16,7 +20,7 @@ const shots: Record<Shot, { station: Station; cam: V3; look: V3; orbit?: number;
   balance: { station: 'map', cam: [8.2, 4.6, 7.2], look: [3.4, 2.2, 0.9] },
   outlook: { station: 'map', cam: [5, 6.6, 8.6], look: [1.0, 0, 1.3] },
   shield: { station: 'map', cam: [10.5, 8.5, 13.5], look: [0, 1.4, 0] },
-  finale: { station: 'map', cam: [0, 60, 74], look: [0, -4, 4], orbit: 0.025, fog: 0.004 },
+  finale: { station: 'map', cam: [0, 46, 96], look: [0, -2, -10], orbit: 0.02, fog: 0.004 },
   blocks: { station: 'blocks', cam: [5.4, 3.2, 9.5], look: [-0.6, 0.1, 0] },
   scatter: { station: 'signals', cam: [0, 1.4, 11], look: [0, 0.2, 0] },
   braid: { station: 'signals', cam: [3.2, 1.3, 10.5], look: [2.0, 0, 0] },
@@ -64,7 +68,7 @@ export async function createScene(host: HTMLElement, initial: Shot): Promise<Sce
   let low = new URLSearchParams(location.search).get('quality') === 'low';
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(low ? 1 : Math.min(devicePixelRatio, 1.5));
-  renderer.setClearColor(bg, 0);
+  renderer.setClearColor(0x000000, 0);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.25;
   renderer.domElement.setAttribute('aria-hidden', 'true');
@@ -72,11 +76,14 @@ export async function createScene(host: HTMLElement, initial: Shot): Promise<Sce
   const scene = new THREE.Scene();
   // ACES crushes very dark colors to black; this fog color tone-maps back to the page background (#070b0e).
   const fog = new THREE.FogExp2(0x14191c, 0.03); scene.fog = fog;
-  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 400);
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 1500);
   scene.add(new THREE.HemisphereLight(0xd6f5ea, 0x0a1411, 1.3));
   const key = new THREE.DirectionalLight(0xe2fff4, 3.2); key.position.set(-20, 30, 14); scene.add(key);
   const rim = new THREE.DirectionalLight(0x8abfff, 1.6); rim.position.set(18, 8, -20); scene.add(rim);
   const world = new THREE.Group(); scene.add(world);
+  // A soft studio reflection so metal and glass read as real materials instead of flat color.
+  const pmrem = new THREE.PMREMGenerator(renderer), environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environment = environment; scene.environmentIntensity = 0.32; pmrem.dispose();
 
   let seed = 93;
   const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
@@ -93,7 +100,7 @@ export async function createScene(host: HTMLElement, initial: Shot): Promise<Sce
   const metal = new THREE.MeshStandardMaterial({ color: 0x2c4546, roughness: 0.35, metalness: 0.75 });
   const dark = new THREE.MeshStandardMaterial({ color: 0x0f1c20, roughness: 0.5, metalness: 0.6 });
   const neon = (color: number, opacity = 1) => new THREE.MeshBasicMaterial({ color, transparent: opacity < 1, opacity, toneMapped: false });
-  const glass = (color: number, opacity = 0.16) => new THREE.MeshStandardMaterial({ color, transparent: true, opacity, metalness: 0.5, roughness: 0.2, depthWrite: false });
+  const glass = (color: number, opacity = 0.16) => new THREE.MeshPhysicalMaterial({ color, transparent: true, opacity, metalness: 0.2, roughness: 0.3, clearcoat: 0.5, clearcoatRoughness: 0.35, envMapIntensity: 0.6, depthWrite: false });
   const additive = <T extends THREE.Material>(material: T) => { material.blending = THREE.AdditiveBlending; material.depthWrite = false; material.transparent = true; return material; };
   function edges<T extends THREE.Mesh>(mesh: T, color = mint, opacity = 0.5) { mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry, 25), new THREE.LineBasicMaterial({ color, transparent: true, opacity }))); return mesh; }
   function flatRing(r: number, y: number, parent: THREE.Object3D, color = teal, opacity = 0.3, width = 0.014) {
@@ -132,8 +139,11 @@ export async function createScene(host: HTMLElement, initial: Shot): Promise<Sce
     world.add(group); stations[name] = group;
     flatRing(5.2, -2.3, group, teal, 0.22); flatRing(5.55, -2.3, group, teal, 0.1);
   }
-  const ground = new THREE.GridHelper(260, 130, 0x1f3d35, 0x132520); ground.position.y = -2.45;
-  Object.assign(ground.material as THREE.Material, { transparent: true, opacity: 0.32 }); world.add(ground);
+  // The world stands on a dark planet; from altitude its curve and glowing rim appear (opening and closing shots).
+  const planet = createPlanet(600, -2.45, 0x14191c, 0x1d3d36), atmosphere = createAtmosphere(600, -2.45, 0x4fd1b0);
+  // The backdrop shares the planet's base color (the fog color, which tone-maps to the page background), so the horizon has no seam.
+  const backdrop = createBackdrop(1200, 0x14191c);
+  world.add(planet.mesh, atmosphere.mesh); scene.add(backdrop);
   const dust = points(1800, 0.09, world); dust.material.opacity = 0.55;
   for (let i = 0; i < 1800; i++) { dust.position.setXYZ(i, (random() - 0.5) * 190, -2 + random() * 26, (random() - 0.5) * 190); dust.paint(i, random() > 0.8 ? amber : mint, 0.4 + random() * 0.5); }
 
@@ -170,7 +180,8 @@ export async function createScene(host: HTMLElement, initial: Shot): Promise<Sce
   });
   const visayas = hubPositions[1];
   const arcs = [[0, 1], [1, 2]].map(([a, b]) => { const s = hubPositions[a].clone().setY(0.35), e = hubPositions[b].clone().setY(0.35); return new THREE.QuadraticBezierCurve3(s, s.clone().lerp(e, 0.5).setY(2.2), e); });
-  arcs.forEach(curve => map.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 64, 0.014, 6), neon(teal))));
+  const arcMaterial = createFlowMaterial(teal, 3, 0.45);
+  arcs.forEach(curve => map.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 64, 0.02, 6), arcMaterial)));
   const pulses = points(24, 0.24, map); for (let i = 0; i < 24; i++) pulses.paint(i, i % 2 ? mint : amber, 1.2);
 
   const reds = new Set<number>(); while (reds.size < 30) reds.add(Math.floor(random() * 123));
@@ -207,9 +218,10 @@ export async function createScene(host: HTMLElement, initial: Shot): Promise<Sce
   const horizons = [0.8, 1.4, 2.0].map(r => { const ringMesh = flatRing(r, 0.28, map, amber, 0, 0.016); ringMesh.position.x = visayas.x; ringMesh.position.z = visayas.z; return ringMesh; });
   const domeGeometry = new THREE.SphereGeometry(6.8, 36, 14, 0, Math.PI * 2, 0, Math.PI / 2);
   const dome = new THREE.Group(); dome.position.y = -0.24; map.add(dome);
-  dome.add(new THREE.Mesh(domeGeometry, additive(new THREE.MeshBasicMaterial({ color: mint, wireframe: true, opacity: 0.16 }))), new THREE.Mesh(domeGeometry, additive(new THREE.MeshBasicMaterial({ color: teal, opacity: 0.05, side: THREE.DoubleSide }))));
+  const domeMaterial = createHologramMaterial(mint); domeMaterial.uniforms.uOpacity.value = 0.4;
+  dome.add(new THREE.Mesh(domeGeometry, additive(new THREE.MeshBasicMaterial({ color: mint, wireframe: true, opacity: 0.08 }))), new THREE.Mesh(new THREE.SphereGeometry(6.8, 64, 32, 0, Math.PI * 2, 0, Math.PI / 2), domeMaterial));
   const spokeCurves = Object.values(angles).map(degrees => { const a = degrees * Math.PI / 180, end = new THREE.Vector3(Math.cos(a) * radius, -1.6, Math.sin(a) * radius); return new THREE.QuadraticBezierCurve3(new THREE.Vector3(0, 0.4, 0), new THREE.Vector3(end.x * 0.5, 9, end.z * 0.5), end); });
-  const spokeMaterial = additive(new THREE.MeshBasicMaterial({ color: mint, opacity: 0 }));
+  const spokeMaterial = createFlowMaterial(mint, 2, 0.35, 0.3);
   const spokes = new THREE.Group(); map.add(spokes);
   spokeCurves.forEach(curve => spokes.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 80, 0.07, 6), spokeMaterial)));
   const spokePulses = points(28, 1.1, spokes); for (let i = 0; i < 28; i++) spokePulses.paint(i, i % 3 ? mint : amber, 1.2);
@@ -319,15 +331,52 @@ export async function createScene(host: HTMLElement, initial: Shot): Promise<Sce
   });
   const neutral = new THREE.Color(0xd9fbe6), clusterTint = clusterColors.map(c => new THREE.Color(c));
 
+  // Blueprint-to-real: each station's solids are cut away above a height that rises when the camera arrives, while its edge lines stay lit.
+  const seam = { value: new THREE.Color(mint).multiplyScalar(0.9) }, shown = 1000, patched = new Set<THREE.Material>();
+  const revealRange = (name: Station): [number, number] => name === 'map' ? [-0.7, 3.6] : [-2.6, 4.4];
+  const reveals = {} as Record<Station, { value: number }>;
+  for (const [name, group] of Object.entries(stations) as [Station, THREE.Group][]) {
+    const reveal = reveals[name] = { value: shown };
+    group.traverse(obj => {
+      const mesh = obj as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+        if (patched.has(material) || !(material instanceof THREE.MeshStandardMaterial || material instanceof THREE.MeshBasicMaterial)) continue;
+        makeRevealable(material, reveal, seam); patched.add(material);
+      }
+    });
+  }
+  const revealing = { station: initial === 'finale' ? 'map' as Station : shots[initial].station, wait: 0, progress: 1 };
+
+  // A stream of data travels with the camera between stations and vanishes on arrival; on the closing shot it becomes the web linking every station.
+  const swarmCount = low ? 3000 : 9000, lowSwarm = 3000;
+  const swarm = createSwarm(swarmCount, random); world.add(swarm.object); swarm.trail.set(mint).multiplyScalar(0.4);
+  scene.updateMatrixWorld(true);
+  function formation(fill: (i: number, p: THREE.Vector3, c: THREE.Color) => void): Formation {
+    const position = new Float32Array(swarmCount * 3), color = new Float32Array(swarmCount * 3), p = new THREE.Vector3(), c = new THREE.Color();
+    for (let i = 0; i < swarmCount; i++) { fill(i, p, c.setRGB(0, 0, 0)); p.toArray(position, i * 3); c.toArray(color, i * 3); }
+    return { position, color };
+  }
+  const clouds = Object.fromEntries((Object.keys(stations) as Station[]).map(name => [name, formation((_, p) => p.set(gauss() * 1.6, 0.6 + gauss() * 0.9, gauss() * 1.6).add(stations[name].position))])) as Record<Station, Formation>;
+  const web = formation((i, p, c) => {
+    if (i % 10 < 7) { spokeCurves[i % 7].getPoint(random(), p).add(v1.set(gauss(), gauss(), gauss()).multiplyScalar(0.22)); c.set(random() > 0.8 ? amber : mint).multiplyScalar(0.2 + random() * 0.4); }
+    else { const a = random() * Math.PI * 2, r = 7.6 + gauss() * 0.3; p.set(Math.cos(a) * r, -0.2 + gauss() * 0.1, Math.sin(a) * r); c.set(teal).multiplyScalar(0.15 + random() * 0.3); }
+  });
+  swarm.scatter(formation((_, p) => p.set(gauss() * 40, 40 + Math.abs(gauss()) * 30, 120 + gauss() * 50)));
+  const swarmTarget = (shot: Shot) => shot === 'finale' ? web : clouds[shots[shot].station];
+
   // Rendering.
   const renderTarget = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: low ? 0 : 4 });
   const composer = new EffectComposer(renderer, renderTarget);
   composer.addPass(new RenderPass(scene, camera));
+  // Shallow focus: the target stays sharp, nearer and farther things soften like a long lens.
+  const bokeh = new BokehPass(scene, camera, { focus: 10, aperture: 0.00035, maxblur: 0.0045 }); bokeh.enabled = !low; composer.addPass(bokeh);
   const bloom = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.65, 0.5, 0.9); bloom.enabled = !low; composer.addPass(bloom); composer.addPass(new OutputPass());
+  if (low) swarm.setVisible(lowSwarm);
 
   const anim = Object.fromEntries(animKeys.map(k => [k, 0])) as Record<AnimKey, number>;
   const last: Partial<Record<AnimKey, number>> = {};
-  let current: Shot = initial, orbitAngle = 0, width = 1, height = 1, frame = 0, previous = performance.now(), time = 0, pulsePhase = 0, disposed = false, dirty = true;
+  let current: Shot = initial, orbitAngle = 0, bank = 0, started = false, width = 1, height = 1, frame = 0, previous = performance.now(), time = 0, pulsePhase = 0, disposed = false, dirty = true;
   let paused = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let flight: { from: THREE.Vector3; control: THREE.Vector3; to: THREE.Vector3; lookFrom: THREE.Vector3; lookTo: THREE.Vector3; t: number; duration: number } | null = null;
   const basePos = new THREE.Vector3(0, 80, 96), baseLook = new THREE.Vector3(), pointer = { x: 0, y: 0, tx: 0, ty: 0 }, drift = new THREE.Vector3(), right = new THREE.Vector3(), samples: number[] = [];
@@ -345,8 +394,19 @@ export async function createScene(host: HTMLElement, initial: Shot): Promise<Sce
       const from = camera.position.clone().sub(drift), distance = from.distanceTo(pos), control = from.clone().lerp(pos, 0.5);
       control.y += Math.min(distance * 0.3, 18);
       flight = { from, control, to: pos, lookFrom: baseLook.clone(), lookTo: look, t: 0, duration: THREE.MathUtils.clamp(1 + distance * 0.02, 1.2, 2.8) };
+      // Bank gently into the turn, like a drone shot: the sign follows which side the destination lies on.
+      const travel = pos.clone().sub(from), forward = look.clone().sub(pos);
+      bank = Math.sign(forward.x * travel.z - forward.z * travel.x) * 0.08 * THREE.MathUtils.clamp(distance / 30, 0.2, 1);
     }
-    orbitAngle = 0; current = next; dirty = true;
+    const arriving = shots[next].station, leaving = shots[current].station;
+    if (!started || arriving !== leaving) {
+      reveals[leaving].value = shown;
+      reveals[arriving].value = paused ? shown : revealRange(arriving)[0];
+      Object.assign(revealing, { station: arriving, wait: (flight?.duration ?? 0) * 0.55, progress: paused ? 1 : 0 });
+    }
+    const reach = stations[leaving].position.distanceTo(stations[arriving].position);
+    swarm.morph(swarmTarget(next), (flight?.duration ?? 1.4) + 0.6, Math.min(Math.max(reach, started ? 12 : 60) * 0.25, 14), 1.3, paused);
+    orbitAngle = 0; current = next; started = true; dirty = true;
   }
   function resize() {
     width = Math.max(1, host.clientWidth); height = Math.max(1, host.clientHeight);
@@ -371,8 +431,23 @@ export async function createScene(host: HTMLElement, initial: Shot): Promise<Sce
     right.setFromMatrixColumn(camera.matrixWorld, 0);
     drift.set(0, Math.sin(time * 0.17) * 0.15 - pointer.y * 0.35, 0).addScaledVector(right, Math.sin(time * 0.21) * 0.25 + pointer.x * 0.7);
     camera.position.copy(basePos).sub(baseLook).applyAxisAngle(up, orbitAngle).add(baseLook).add(drift);
-    camera.lookAt(baseLook); camera.updateMatrixWorld();
+    camera.lookAt(baseLook);
+    if (flight) camera.rotateZ(bank * Math.sin(flight.t * Math.PI));
+    camera.updateMatrixWorld();
     fog.density += ((shots[current].fog ?? 0.03) - fog.density) * Math.min(1, dt * 1.6 || 1);
+    planet.uniforms.uFog.value = fog.density; planet.uniforms.uCamera.value.copy(camera.position); backdrop.position.copy(camera.position);
+    atmosphere.uniforms.uStrength.value = THREE.MathUtils.smoothstep(camera.position.y, 14, 40) * 1.6;
+    (bokeh.uniforms as Record<string, THREE.IUniform<number>>).focus.value = camera.position.distanceTo(baseLook);
+    swarm.update(dt, time, fog.density, renderer.domElement.height * 0.5);
+    arcMaterial.uniforms.uTime.value = time; spokeMaterial.uniforms.uTime.value = time; domeMaterial.uniforms.uTime.value = time;
+    if (revealing.progress < 1) {
+      if (revealing.wait > 0) revealing.wait -= dt;
+      else {
+        revealing.progress = paused ? 1 : Math.min(1, revealing.progress + dt / 1.5);
+        const [bottom, top] = revealRange(revealing.station);
+        reveals[revealing.station].value = revealing.progress >= 1 ? shown : bottom + (top - bottom) * easeInOut(revealing.progress);
+      }
+    }
 
     const goal = goals(current);
     for (const k of animKeys) {
@@ -398,7 +473,7 @@ export async function createScene(host: HTMLElement, initial: Shot): Promise<Sce
     (sweep.material as THREE.MeshBasicMaterial).opacity = anim.outlook * 0.3; sweep.rotation.z = -time * 1.4;
     horizons.forEach(h => { (h.material as THREE.MeshBasicMaterial).opacity = anim.outlook * 0.45; });
     dome.visible = anim.shield > 0.001; dome.scale.setScalar(Math.max(easeOut(anim.shield), 1e-4)); dome.rotation.y = time * 0.05;
-    spokes.visible = anim.finale > 0.001; spokeMaterial.opacity = anim.finale * 0.32; spokePulses.material.opacity = anim.finale;
+    spokes.visible = anim.finale > 0.001; spokeMaterial.uniforms.uOpacity.value = anim.finale * 0.6; spokePulses.material.opacity = anim.finale;
     if (spokes.visible) { for (let i = 0; i < 28; i++) { spokeCurves[i % 7].getPoint((time * 0.15 + i / 28) % 1, v1); spokePulses.position.setXYZ(i, v1.x, v1.y, v1.z); } spokePulses.position.needsUpdate = true; }
 
     if (changed('blocks')) {
@@ -482,7 +557,7 @@ export async function createScene(host: HTMLElement, initial: Shot): Promise<Sce
     if (!paused && !low && samples.length < 150) {
       samples.push(dt);
       // A slow median frame after warm-up means a weak GPU: drop resolution and glow, keep the motion.
-      if (samples.length === 150 && [...samples].sort((a, b) => a - b)[75] > 0.034) { low = true; renderer.setPixelRatio(1); composer.setPixelRatio(1); bloom.enabled = false; resize(); }
+      if (samples.length === 150 && [...samples].sort((a, b) => a - b)[75] > 0.034) { low = true; renderer.setPixelRatio(1); composer.setPixelRatio(1); bloom.enabled = false; bokeh.enabled = false; swarm.setVisible(lowSwarm); resize(); }
     }
     time += paused ? 0 : dt;
     update(paused ? 0 : dt);
@@ -490,17 +565,18 @@ export async function createScene(host: HTMLElement, initial: Shot): Promise<Sce
   }
   function contextLost(event: Event) { event.preventDefault(); host.classList.remove('scene-ready'); paused = true; }
   renderer.domElement.addEventListener('webglcontextlost', contextLost);
-  camera.position.copy(basePos); camera.lookAt(baseLook);
-  resize(); setShot(initial); host.classList.add('scene-ready'); frame = requestAnimationFrame(tick);
+  // Opening: start high over the planet's glowing rim and dive down to the first shot.
+  resize(); basePos.set(30, 100, 250); baseLook.set(0, 6, -60); camera.position.copy(basePos); camera.lookAt(baseLook);
+  setShot(initial); host.classList.add('scene-ready'); frame = requestAnimationFrame(tick);
   return {
     setShot(next) { if (next !== current) setShot(next); },
     setSupply(mw) { supply = mw; applySupply(); dirty = true; },
-    setPaused(value) { paused = value; if (paused && flight) { basePos.copy(flight.to); baseLook.copy(flight.lookTo); flight = null; } dirty = true; },
+    setPaused(value) { paused = value; if (paused) { swarm.settle(); revealing.progress = 1; reveals[revealing.station].value = shown; } if (paused && flight) { basePos.copy(flight.to); baseLook.copy(flight.lookTo); flight = null; } dirty = true; },
     dispose() {
       disposed = true; cancelAnimationFrame(frame); observer.disconnect(); window.removeEventListener('pointermove', move);
       const geometries = new Set<THREE.BufferGeometry>(), materials = new Set<THREE.Material>();
       scene.traverse(obj => { const mesh = obj as THREE.Mesh; if (mesh.geometry) geometries.add(mesh.geometry); if (mesh.material) (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).forEach(m => materials.add(m)); });
-      geometries.forEach(g => g.dispose()); materials.forEach(m => m.dispose()); dot.dispose(); heat.dispose(); composer.dispose(); renderer.dispose(); renderer.domElement.remove(); labels.forEach(l => l.element.remove());
+      geometries.forEach(g => g.dispose()); materials.forEach(m => m.dispose()); dot.dispose(); heat.dispose(); environment.dispose(); swarm.dispose(); composer.dispose(); renderer.dispose(); renderer.domElement.remove(); labels.forEach(l => l.element.remove());
     },
   };
 }

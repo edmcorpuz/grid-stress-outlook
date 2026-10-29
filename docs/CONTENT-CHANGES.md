@@ -1,5 +1,13 @@
 # What changed from the original
 
+## Cinematic 3D pass (29 October 2026)
+
+- Each station appears as a glowing blueprint and fills in from the floor up when the camera arrives.
+- The opening shot starts above a dark planet with a glowing rim and dives to the islands; the world now stands on that curved planet.
+- A data stream travels with the camera between stations and disappears on arrival; on the closing slide it forms the web linking every station.
+- Studio reflections on metal and glass, shallow focus, a slight bank on turns, energy pulses on the power lines, and a hologram-style safeguard dome.
+- Slow PCs drop the focus blur and glow automatically; `?quality=low` forces this. Slide text, order, timing and scripts are unchanged.
+
 ## Simplified redesign (29 October 2026)
 
 - Restored strict compliance with the nine-part presentation format: 17 main slides, each labeled with its part, in order, with nothing added. The introduction to the field and "why big data" are back in Part 1, and limitations, ethics and privacy are back in the main talk (slide 16) instead of only the appendix.
